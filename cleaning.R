@@ -12,14 +12,23 @@ pacman::p_load(
 # IMPORT---------------
 linelist_raw <- import("linelist_raw.xlsx")
 
-#skimr::skim(linelist_raw)
-
+skimr::skim(linelist_raw)
 
 linelist <- linelist_raw %>%
-  
-  
-  janitor::clean_names()
 
-rename(date_infection =infection_date,
+  janitor::clean_names() %>% 
+
+rename(date_infection = infection_date,
        date_hospitalisation = hosp_date,
-       date_outcome = date_of_outcome)
+       date_outcome = date_of_outcome) %>% 
+# deduplication
+  distinct() %>% 
+
+# remove columns
+select(-c(date_onset, fever:vomit)) %>% 
+
+# add BMI
+mutate(
+  bmi = wt_kg / (ht_cm/100)^2
+)
+
